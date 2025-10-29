@@ -5,7 +5,7 @@ import { QUERY_MESSAGES, MUTATION_ADD, SUB_MESSAGE_ADDED } from "./graphql";
 export default function App() {
   const [name, setName] = useState("Guest");
   const [text, setText] = useState("");
-  const [filter, setFilter] = useState("all"); // 'all' | 'mine'
+  const [filter, setFilter] = useState("all");
 
   const { data, loading, error } = useQuery(QUERY_MESSAGES, {
     variables: { limit: 30, offset: 0 },
@@ -13,16 +13,18 @@ export default function App() {
 
   const [addMessage, addState] = useMutation(MUTATION_ADD);
 
-  // Append new messages in real-time
   useSubscription(SUB_MESSAGE_ADDED, {
     onData: ({ client, data }) => {
       const msg = data.data?.messageAdded;
       if (!msg) return;
-      // update cache: prepend new message
+
       const prev = client.readQuery({
         query: QUERY_MESSAGES,
         variables: { limit: 30, offset: 0 },
       });
+
+      if (prev?.messages?.some((m) => m.id === msg.id)) return;
+
       client.writeQuery({
         query: QUERY_MESSAGES,
         variables: { limit: 30, offset: 0 },
