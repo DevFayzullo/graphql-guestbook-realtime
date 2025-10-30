@@ -18,16 +18,23 @@ export default function App() {
       const msg = data.data?.messageAdded;
       if (!msg) return;
 
-      const prev = client.readQuery({
-        query: QUERY_MESSAGES,
-        variables: { limit: 30, offset: 0 },
-      });
+      const vars = { limit: 30, offset: 0 };
+      const prev = client.readQuery({ query: QUERY_MESSAGES, variables: vars });
 
-      if (prev?.messages?.some((m) => m.id === msg.id)) return;
+      if (
+        prev?.messages?.some(
+          (m) =>
+            m.id === msg.id ||
+            (m.id?.startsWith?.("temp-") &&
+              m.name === msg.name &&
+              m.text === msg.text)
+        )
+      )
+        return;
 
       client.writeQuery({
         query: QUERY_MESSAGES,
-        variables: { limit: 30, offset: 0 },
+        variables: vars,
         data: { messages: [msg, ...(prev?.messages || [])].slice(0, 30) },
       });
     },
@@ -54,10 +61,19 @@ export default function App() {
           query: QUERY_MESSAGES,
           variables: { limit: 30, offset: 0 },
         });
+        const deduped = (prev?.messages || []).filter(
+          (m) =>
+            !(
+              m.id === newMsg.id ||
+              (m.id?.startsWith?.("temp-") &&
+                m.name === newMsg.name &&
+                m.text === newMsg.text)
+            )
+        );
         cache.writeQuery({
           query: QUERY_MESSAGES,
           variables: { limit: 30, offset: 0 },
-          data: { messages: [newMsg, ...(prev?.messages || [])].slice(0, 30) },
+          data: { messages: [newMsg, ...deduped].slice(0, 30) },
         });
       },
     });
@@ -75,106 +91,123 @@ export default function App() {
     <div
       style={{
         maxWidth: 720,
-        margin: "0 auto",
+        margin: "40px auto",
         padding: 24,
-        fontFamily: "Inter, system-ui, Arial",
+        fontFamily: "Inter, system-ui, sans-serif",
+        background: "white",
+        borderRadius: 20,
+        boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
       }}>
-      <h1>📝 GraphQL Guestbook (Realtime)</h1>
+      <h1
+        style={{
+          textAlign: "center",
+          marginBottom: 20,
+          fontWeight: 600,
+          fontSize: "1.8rem",
+        }}>
+        🪶 GraphQL Guestbook <span style={{ opacity: 0.6 }}>(Realtime)</span>
+      </h1>
 
       <form
         onSubmit={onSend}
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 3fr auto",
-          gap: 8,
-          marginBottom: 16,
+          display: "flex",
+          gap: 10,
+          marginBottom: 20,
+          alignItems: "center",
         }}>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
           style={{
-            padding: "10px 12px",
-            borderRadius: 8,
-            border: "1px solid #ddd",
+            flex: 1,
+            padding: "10px 14px",
+            borderRadius: 10,
+            border: "1px solid #e2e8f0",
+            background: "#f8fafc",
           }}
         />
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Say hello..."
+          placeholder="Say something..."
           style={{
-            padding: "10px 12px",
-            borderRadius: 8,
-            border: "1px solid #ddd",
+            flex: 3,
+            padding: "10px 14px",
+            borderRadius: 10,
+            border: "1px solid #e2e8f0",
+            background: "#f8fafc",
           }}
         />
         <button
           type="submit"
           disabled={addState.loading}
           style={{
-            padding: "10px 14px",
-            borderRadius: 8,
-            border: "1px solid #2563eb",
+            padding: "10px 20px",
+            borderRadius: 10,
+            border: "none",
             background: addState.loading ? "#93c5fd" : "#2563eb",
             color: "white",
-            cursor: addState.loading ? "not-allowed" : "pointer",
+            fontWeight: 500,
+            cursor: "pointer",
+            transition: "all 0.2s ease",
           }}>
-          {addState.loading ? "Sending..." : "Send"}
+          {addState.loading ? "..." : "Send"}
         </button>
       </form>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-        <button
-          onClick={() => setFilter("all")}
-          style={{
-            padding: "6px 10px",
-            borderRadius: 8,
-            border: "1px solid #0ea5e9",
-            background: filter === "all" ? "#0ea5e9" : "transparent",
-            color: filter === "all" ? "white" : "#0ea5e9",
-            cursor: "pointer",
-          }}>
-          All
-        </button>
-        <button
-          onClick={() => setFilter("mine")}
-          style={{
-            padding: "6px 10px",
-            borderRadius: 8,
-            border: "1px solid #0ea5e9",
-            background: filter === "mine" ? "#0ea5e9" : "transparent",
-            color: filter === "mine" ? "white" : "#0ea5e9",
-            cursor: "pointer",
-          }}>
-          Mine
-        </button>
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          marginBottom: 16,
+          justifyContent: "center",
+        }}>
+        {["all", "mine"].map((t) => (
+          <button
+            key={t}
+            onClick={() => setFilter(t)}
+            style={{
+              padding: "8px 16px",
+              borderRadius: 20,
+              border: "1px solid #2563eb",
+              background: filter === t ? "#2563eb" : "transparent",
+              color: filter === t ? "white" : "#2563eb",
+              cursor: "pointer",
+              transition: "0.2s",
+            }}>
+            {t === "all" ? "All" : "Mine"}
+          </button>
+        ))}
       </div>
 
-      {loading && <p>⏳ Loading...</p>}
-      {error && <p style={{ color: "crimson" }}>❌ {error.message}</p>}
-
-      <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: 8 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {filtered.map((m) => (
-          <li
+          <div
             key={m.id}
             style={{
-              border: "1px solid #eee",
-              borderRadius: 10,
-              padding: 12,
-              background: "#fafafa",
+              alignSelf: m.name === name.trim() ? "flex-end" : "flex-start",
+              maxWidth: "80%",
+              background: m.name === name.trim() ? "#2563eb" : "#f1f5f9",
+              color: m.name === name.trim() ? "white" : "#0f172a",
+              borderRadius: 14,
+              padding: "10px 14px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
             }}>
-            <div style={{ fontSize: 14, opacity: 0.7 }}>
-              <b>{m.name}</b> • {new Date(m.createdAt).toLocaleString()}
+            <div style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
+              <b>{m.name}</b> • {new Date(m.createdAt).toLocaleTimeString()}
             </div>
-            <div style={{ marginTop: 4 }}>{m.text}</div>
-          </li>
+            <div style={{ whiteSpace: "pre-wrap" }}>{m.text}</div>
+          </div>
         ))}
-      </ul>
 
-      {!loading && filtered.length === 0 && (
-        <p style={{ opacity: 0.7 }}>No messages yet.</p>
-      )}
+        {!loading && filtered.length === 0 && (
+          <p style={{ textAlign: "center", opacity: 0.6 }}>
+            No messages yet ✨
+          </p>
+        )}
+      </div>
     </div>
   );
 }
