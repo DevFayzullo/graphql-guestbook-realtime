@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { QUERY_MESSAGES, MUTATION_ADD, SUB_MESSAGE_ADDED } from "./graphql";
 
 export default function App() {
-  const [name, setName] = useState("Guest");
+  const [name, setName] = useState("Admin");
   const [text, setText] = useState("");
   const [filter, setFilter] = useState("all");
 
@@ -11,31 +11,62 @@ export default function App() {
     variables: { limit: 30, offset: 0 },
   });
 
-  const [addMessage, addState] = useMutation(MUTATION_ADD);
+  const [addMessage, addState] = useMutation(MUTATION_ADD, {
+    optimisticResponse: {
+      addMessage: {
+        __typename: "Message",
+        id: `temp-${Date.now()}`,
+        name,
+        text,
+        createdAt: new Date().toISOString(),
+      },
+    },
+    update: (cache, { data }) => {
+      const newMsg = data?.addMessage;
+      if (!newMsg) return;
+      const vars = { limit: 30, offset: 0 };
+      const prev = cache.readQuery({
+        query: QUERY_MESSAGES,
+        variables: vars,
+      }) || {
+        messages: [],
+      };
 
+      // dublikat bo'lsa qo'shma
+      if (prev.messages.some((m) => m.id === newMsg.id)) return;
+
+      cache.writeQuery({
+        query: QUERY_MESSAGES,
+        variables: vars,
+        data: {
+          messages: [newMsg, ...prev.messages].slice(0, 30),
+        },
+      });
+    },
+  });
+
+  // subscription — dublikatdan himoya bilan
   useSubscription(SUB_MESSAGE_ADDED, {
     onData: ({ client, data }) => {
       const msg = data.data?.messageAdded;
       if (!msg) return;
-
       const vars = { limit: 30, offset: 0 };
-      const prev = client.readQuery({ query: QUERY_MESSAGES, variables: vars });
+      const prev = client.readQuery({
+        query: QUERY_MESSAGES,
+        variables: vars,
+      }) || {
+        messages: [],
+      };
 
-      if (
-        prev?.messages?.some(
-          (m) =>
-            m.id === msg.id ||
-            (m.id?.startsWith?.("temp-") &&
-              m.name === msg.name &&
-              m.text === msg.text)
-        )
-      )
-        return;
+      // shu id bo'lsa qo'shma
+      if (prev.messages.some((m) => m.id === msg.id)) return;
 
       client.writeQuery({
         query: QUERY_MESSAGES,
         variables: vars,
-        data: { messages: [msg, ...(prev?.messages || [])].slice(0, 30) },
+        data: {
+          messages: [msg, ...prev.messages].slice(0, 30),
+        },
       });
     },
   });
@@ -45,42 +76,12 @@ export default function App() {
     if (!name.trim() || !text.trim()) return;
     await addMessage({
       variables: { name: name.trim(), text: text.trim() },
-      optimisticResponse: {
-        addMessage: {
-          __typename: "Message",
-          id: `temp-${Date.now()}`,
-          name: name.trim(),
-          text: text.trim(),
-          createdAt: new Date().toISOString(),
-        },
-      },
-      update: (cache, { data }) => {
-        const newMsg = data?.addMessage;
-        if (!newMsg) return;
-        const prev = cache.readQuery({
-          query: QUERY_MESSAGES,
-          variables: { limit: 30, offset: 0 },
-        });
-        const deduped = (prev?.messages || []).filter(
-          (m) =>
-            !(
-              m.id === newMsg.id ||
-              (m.id?.startsWith?.("temp-") &&
-                m.name === newMsg.name &&
-                m.text === newMsg.text)
-            )
-        );
-        cache.writeQuery({
-          query: QUERY_MESSAGES,
-          variables: { limit: 30, offset: 0 },
-          data: { messages: [newMsg, ...deduped].slice(0, 30) },
-        });
-      },
     });
     setText("");
   };
 
   const messages = data?.messages || [];
+
   const filtered = useMemo(() => {
     if (filter === "mine")
       return messages.filter((m) => m.name === name.trim());
@@ -88,125 +89,116 @@ export default function App() {
   }, [messages, filter, name]);
 
   return (
-    <div
-      style={{
-        maxWidth: 720,
-        margin: "40px auto",
-        padding: 24,
-        fontFamily: "Inter, system-ui, sans-serif",
-        background: "white",
-        borderRadius: 20,
-        boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-      }}>
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: 20,
-          fontWeight: 600,
-          fontSize: "1.8rem",
-        }}>
-        🪶 GraphQL Guestbook <span style={{ opacity: 0.6 }}>(Realtime)</span>
-      </h1>
-
-      <form
-        onSubmit={onSend}
-        style={{
-          display: "flex",
-          gap: 10,
-          marginBottom: 20,
-          alignItems: "center",
-        }}>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Your name"
-          style={{
-            flex: 1,
-            padding: "10px 14px",
-            borderRadius: 10,
-            border: "1px solid #e2e8f0",
-            background: "#f8fafc",
-          }}
-        />
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Say something..."
-          style={{
-            flex: 3,
-            padding: "10px 14px",
-            borderRadius: 10,
-            border: "1px solid #e2e8f0",
-            background: "#f8fafc",
-          }}
-        />
-        <button
-          type="submit"
-          disabled={addState.loading}
-          style={{
-            padding: "10px 20px",
-            borderRadius: 10,
-            border: "none",
-            background: addState.loading ? "#93c5fd" : "#2563eb",
-            color: "white",
-            fontWeight: 500,
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-          }}>
-          {addState.loading ? "..." : "Send"}
-        </button>
-      </form>
-
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          marginBottom: 16,
-          justifyContent: "center",
-        }}>
-        {["all", "mine"].map((t) => (
-          <button
-            key={t}
-            onClick={() => setFilter(t)}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 20,
-              border: "1px solid #2563eb",
-              background: filter === t ? "#2563eb" : "transparent",
-              color: filter === t ? "white" : "#2563eb",
-              cursor: "pointer",
-              transition: "0.2s",
-            }}>
-            {t === "all" ? "All" : "Mine"}
-          </button>
-        ))}
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {filtered.map((m) => (
-          <div
-            key={m.id}
-            style={{
-              alignSelf: m.name === name.trim() ? "flex-end" : "flex-start",
-              maxWidth: "80%",
-              background: m.name === name.trim() ? "#2563eb" : "#f1f5f9",
-              color: m.name === name.trim() ? "white" : "#0f172a",
-              borderRadius: 14,
-              padding: "10px 14px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-            }}>
-            <div style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
-              <b>{m.name}</b> • {new Date(m.createdAt).toLocaleTimeString()}
-            </div>
-            <div style={{ whiteSpace: "pre-wrap" }}>{m.text}</div>
+    <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-100 to-slate-200 flex items-center justify-center p-4">
+      <div className="w-full max-w-3xl bg-white/60 backdrop-blur shadow-xl rounded-2xl border border-white/50 overflow-hidden">
+        {/* header */}
+        <header className="px-6 py-5 border-b border-slate-200 flex items-center justify-between gap-4 bg-white/70">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-slate-900 flex items-center gap-2">
+              🪶 GraphQL Guestbook
+              <span className="text-xs font-medium bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+                Realtime
+              </span>
+            </h1>
+            <p className="text-sm text-slate-500">
+              Query • Mutation • Subscription • Optimistic UI
+            </p>
           </div>
-        ))}
+          <div className="hidden md:flex text-xs text-slate-400 gap-2">
+            <span>HTTP: /graphql</span>
+            <span>WS: /graphql</span>
+          </div>
+        </header>
 
-        {!loading && filtered.length === 0 && (
-          <p style={{ textAlign: "center", opacity: 0.6 }}>
-            No messages yet ✨
-          </p>
-        )}
+        {/* form */}
+        <form
+          onSubmit={onSend}
+          className="px-6 pt-5 pb-3 flex flex-col md:flex-row gap-3">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full md:w-1/5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
+            placeholder="Your name"
+          />
+          <input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="flex-1 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
+            placeholder="Say something..."
+          />
+          <button
+            type="submit"
+            disabled={addState.loading}
+            className="md:w-auto w-full bg-sky-500 disabled:bg-sky-300 hover:bg-sky-600 transition text-white text-sm font-medium px-5 py-2 rounded-xl shadow-sm">
+            {addState.loading ? "Sending..." : "Send"}
+          </button>
+        </form>
+
+        {/* filter buttons */}
+        <div className="px-6 pb-2 flex gap-2">
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-3 py-1.5 text-xs rounded-full border transition ${
+              filter === "all"
+                ? "bg-sky-100 text-sky-700 border-sky-200"
+                : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
+            }`}>
+            All
+          </button>
+          <button
+            onClick={() => setFilter("mine")}
+            className={`px-3 py-1.5 text-xs rounded-full border transition ${
+              filter === "mine"
+                ? "bg-sky-100 text-sky-700 border-sky-200"
+                : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
+            }`}>
+            Mine
+          </button>
+        </div>
+
+        {/* messages */}
+        <div className="px-6 pb-6 space-y-3 max-h-[60vh] overflow-y-auto">
+          {loading && <p className="text-sm text-slate-400">Loading...</p>}
+          {error && <p className="text-sm text-red-500">❌ {error.message}</p>}
+
+          {!loading && filtered.length === 0 && (
+            <p className="text-sm text-slate-400 text-center py-12">
+              No messages yet. Be the first ✨
+            </p>
+          )}
+
+          {filtered.map((m) => {
+            const isMine = m.name === name.trim();
+            return (
+              <div
+                key={m.id}
+                className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`rounded-2xl px-4 py-2.5 max-w-[80%] shadow-sm ${
+                    isMine
+                      ? "bg-sky-500 text-white rounded-br-sm"
+                      : "bg-slate-50 text-slate-900 rounded-bl-sm border border-slate-100"
+                  }`}>
+                  <div
+                    className={`flex items-center gap-2 text-[11px] mb-1 ${
+                      isMine ? "text-sky-100/90" : "text-slate-400"
+                    }`}>
+                    <span className="font-semibold">{m.name}</span>
+                    <span>
+                      {new Date(m.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                  <p className="text-sm leading-snug whitespace-pre-wrap">
+                    {m.text}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
