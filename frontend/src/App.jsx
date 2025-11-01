@@ -89,7 +89,7 @@ export default function App() {
   }, [messages, filter, name]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-100 to-slate-200 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-b from-slate-100 via-slate-100 to-slate-200 flex items-center justify-center p-4">
       <div className="w-full max-w-3xl bg-white/60 backdrop-blur shadow-xl rounded-2xl border border-white/50 overflow-hidden">
         {/* header */}
         <header className="px-6 py-5 border-b border-slate-200 flex items-center justify-between gap-4 bg-white/70">
