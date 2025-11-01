@@ -32,7 +32,6 @@ export default function App() {
         messages: [],
       };
 
-      // dublikat bo'lsa qo'shma
       if (prev.messages.some((m) => m.id === newMsg.id)) return;
 
       cache.writeQuery({
@@ -45,7 +44,6 @@ export default function App() {
     },
   });
 
-  // subscription — dublikatdan himoya bilan
   useSubscription(SUB_MESSAGE_ADDED, {
     onData: ({ client, data }) => {
       const msg = data.data?.messageAdded;
@@ -58,7 +56,6 @@ export default function App() {
         messages: [],
       };
 
-      // shu id bo'lsa qo'shma
       if (prev.messages.some((m) => m.id === msg.id)) return;
 
       client.writeQuery({
@@ -91,7 +88,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-100 via-slate-100 to-slate-200 flex items-center justify-center p-4">
       <div className="w-full max-w-3xl bg-white/60 backdrop-blur shadow-xl rounded-2xl border border-white/50 overflow-hidden">
-        {/* header */}
         <header className="px-6 py-5 border-b border-slate-200 flex items-center justify-between gap-4 bg-white/70">
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-slate-900 flex items-center gap-2">
@@ -110,7 +106,6 @@ export default function App() {
           </div>
         </header>
 
-        {/* form */}
         <form
           onSubmit={onSend}
           className="px-6 pt-5 pb-3 flex flex-col md:flex-row gap-3">
@@ -134,7 +129,6 @@ export default function App() {
           </button>
         </form>
 
-        {/* filter buttons */}
         <div className="px-6 pb-2 flex gap-2">
           <button
             onClick={() => setFilter("all")}
@@ -156,7 +150,6 @@ export default function App() {
           </button>
         </div>
 
-        {/* messages */}
         <div className="px-6 pb-6 space-y-3 max-h-[60vh] overflow-y-auto">
           {loading && <p className="text-sm text-slate-400">Loading...</p>}
           {error && <p className="text-sm text-red-500">❌ {error.message}</p>}
