@@ -10,9 +10,7 @@ featuring **Query, Mutation, Subscription (Realtime)** with **optimistic UI** an
 
 ## 🖼 Project Banner
 
-![GraphQL Guestbook Banner](./assets/banner.png)
-
-> Put your generated banner image in `frontend/public` or `assets/` and GitHub will render it here.
+![GraphQL Guestbook Banner](./frontend/public/banner.png)
 
 ---
 
@@ -25,15 +23,15 @@ featuring **Query, Mutation, Subscription (Realtime)** with **optimistic UI** an
 
 ## 🧱 Tech Stack
 
-| Layer | Technology |
-|-------|-------------|
-| **Frontend** | React + Vite + Apollo Client |
-| **UI** | Tailwind CSS · Responsive · Glassmorphism Design |
-| **Backend** | Apollo Server + Express + GraphQL Subscriptions |
-| **Realtime** | graphql-ws + WebSocket |
-| **Language** | JavaScript (ES Modules) |
-| **Deployment** | Vercel (frontend) · Render (backend) |
-| **Tools** | npm · Node.js · GitHub |
+| Layer          | Technology                                       |
+| -------------- | ------------------------------------------------ |
+| **Frontend**   | React + Vite + Apollo Client                     |
+| **UI**         | Tailwind CSS · Responsive · Glassmorphism Design |
+| **Backend**    | Apollo Server + Express + GraphQL Subscriptions  |
+| **Realtime**   | graphql-ws + WebSocket                           |
+| **Language**   | JavaScript (ES Modules)                          |
+| **Deployment** | Vercel (frontend) · Render (backend)             |
+| **Tools**      | npm · Node.js · GitHub                           |
 
 ---
 
@@ -59,6 +57,7 @@ npm run dev
 ```
 
 **Optional `.env`**
+
 ```env
 VITE_GRAPHQL_HTTP=http://localhost:4000/graphql
 VITE_GRAPHQL_WS=ws://localhost:4000/graphql
@@ -82,8 +81,8 @@ VITE_GRAPHQL_WS=ws://localhost:4000/graphql
 
 ## 🖼 UI Preview
 
-| Light Mode | Realtime |
-|-------------|-----------|
+| Light Mode                                        | Realtime                                |
+| ------------------------------------------------- | --------------------------------------- |
 | ![light mode screenshot](./screenshots/light.png) | ![realtime](./screenshots/realtime.gif) |
 
 > Two browser tabs showing realtime updates ⚡
@@ -93,13 +92,14 @@ VITE_GRAPHQL_WS=ws://localhost:4000/graphql
 ## 🚀 Deploy Guide
 
 ### 1️⃣ Backend (Render)
+
 - Create new **Web Service**
 - Environment: Node 18+
-- Build Command:  
+- Build Command:
   ```bash
   npm install && npm run start
   ```
-- Start Command:  
+- Start Command:
   ```bash
   node src/index.js
   ```
@@ -108,6 +108,7 @@ VITE_GRAPHQL_WS=ws://localhost:4000/graphql
   `https://graphql-guestbook-api.onrender.com/graphql`
 
 ### 2️⃣ Frontend (Vercel)
+
 - Set Environment Variables:
   ```env
   VITE_GRAPHQL_HTTP=https://graphql-guestbook-api.onrender.com/graphql
