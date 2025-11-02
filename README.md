@@ -12,12 +12,12 @@ featuring **Query, Mutation, Subscription (Realtime)** with **optimistic UI** an
 
 ![GraphQL Guestbook Banner](./frontend/public/banner.png)
 
----
+<!-- ---
 
 ## 🌐 Demo
 
 [🔗 Live Demo (Vercel)](https://your-vercel-app-url.vercel.app)  
-[⚙️ Backend API (Render)](https://your-render-api-url.onrender.com/graphql)
+[⚙️ Backend API (Render)](https://your-render-api-url.onrender.com/graphql) -->
 
 ---
 
@@ -77,7 +77,7 @@ VITE_GRAPHQL_WS=ws://localhost:4000/graphql
 - ✅ **Modern Stack:** Apollo split link (HTTP + WS)
 - ✅ **Reusable code:** Clean modular structure
 
----
+<!-- ---
 
 ## 🖼 UI Preview
 
@@ -85,7 +85,7 @@ VITE_GRAPHQL_WS=ws://localhost:4000/graphql
 | ------------------------------------------------- | --------------------------------------- |
 | ![light mode screenshot](./screenshots/light.png) | ![realtime](./screenshots/realtime.gif) |
 
-> Two browser tabs showing realtime updates ⚡
+> Two browser tabs showing realtime updates ⚡ -->
 
 ---
 
@@ -156,7 +156,7 @@ graphql-guestbook-realtime/
 
 **Your Name**  
 💼 Full Stack / Frontend Developer  
-📫 your-email@example.com
+📫 fayzullo.coder@gmail.com
 
 ---
 
