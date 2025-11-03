@@ -3,9 +3,12 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
-const HTTP_URL =
-  import.meta.env.VITE_GRAPHQL_HTTP || "http://localhost:4000/graphql";
-const WS_URL = import.meta.env.VITE_GRAPHQL_WS || "ws://localhost:4000/graphql";
+const HTTP_URL = import.meta.env.VITE_GRAPHQL_HTTP;
+const WS_URL = import.meta.env.VITE_GRAPHQL_WS;
+
+if (!HTTP_URL || !WS_URL) {
+  throw new Error("Missing VITE_GRAPHQL_HTTP or VITE_GRAPHQL_WS env vars");
+}
 
 const httpLink = new HttpLink({ uri: HTTP_URL });
 
@@ -29,5 +32,20 @@ const link = wsLink
 
 export const client = new ApolloClient({
   link,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Message: { keyFields: ["id"] },
+      Query: {
+        fields: {
+          messages: {
+            merge(existing = [], incoming = []) {
+              const m = new Map();
+              [...incoming, ...existing].forEach((x) => m.set(x.id, x));
+              return Array.from(m.values());
+            },
+          },
+        },
+      },
+    },
+  }),
 });
