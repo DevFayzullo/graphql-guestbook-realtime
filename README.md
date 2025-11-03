@@ -12,12 +12,12 @@ featuring **Query, Mutation, Subscription (Realtime)** with **optimistic UI** an
 
 ![GraphQL Guestbook Banner](./frontend/public/banner.png)
 
-<!-- ---
+---
 
 ## 🌐 Demo
 
-[🔗 Live Demo (Vercel)](https://your-vercel-app-url.vercel.app)  
-[⚙️ Backend API (Render)](https://your-render-api-url.onrender.com/graphql) -->
+[🔗 Live Demo (Vercel)](https://graphql-guestbook-realtime.vercel.app)  
+[⚙️ Backend API (Render)](https://graphql-guestbook-realtime.onrender.com/graphql)
 
 ---
 
