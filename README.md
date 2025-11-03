@@ -154,7 +154,7 @@ graphql-guestbook-realtime/
 
 ## 🧑‍💻 Author
 
-**Your Name**  
+**DevFayzullo**  
 💼 Full Stack / Frontend Developer  
 📫 fayzullo.coder@gmail.com
 
@@ -163,3 +163,4 @@ graphql-guestbook-realtime/
 ## 🪪 License
 
 MIT
+
