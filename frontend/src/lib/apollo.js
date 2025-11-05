@@ -40,7 +40,7 @@ export const client = new ApolloClient({
             merge(existing = [], incoming = []) {
               const map = new Map();
               [...incoming, ...existing].forEach((x) => map.set(x.id, x));
-              return [...map.values()];
+              return Array.from(map.values());
             },
           },
         },
