@@ -7,11 +7,10 @@ const HTTP_URL = import.meta.env.VITE_GRAPHQL_HTTP;
 const WS_URL = import.meta.env.VITE_GRAPHQL_WS;
 
 if (!HTTP_URL || !WS_URL) {
-  throw new Error("Missing VITE_GRAPHQL_HTTP or VITE_GRAPHQL_WS env vars");
+  throw new Error("Missing VITE_GRAPHQL_HTTP or VITE_GRAPHQL_WS");
 }
 
 const httpLink = new HttpLink({ uri: HTTP_URL });
-
 const wsLink =
   typeof window !== "undefined"
     ? new GraphQLWsLink(createClient({ url: WS_URL }))
@@ -39,9 +38,9 @@ export const client = new ApolloClient({
         fields: {
           messages: {
             merge(existing = [], incoming = []) {
-              const m = new Map();
-              [...incoming, ...existing].forEach((x) => m.set(x.id, x));
-              return Array.from(m.values());
+              const map = new Map();
+              [...incoming, ...existing].forEach((x) => map.set(x.id, x));
+              return [...map.values()];
             },
           },
         },
