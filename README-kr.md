@@ -83,7 +83,7 @@ VITE_GRAPHQL_WS=ws://localhost:4000/graphql
 
 ## 🧑‍💻 작성자
 
-**Your Name**  
+**DevFayzullo**  
 💼 풀스택 / 프론트엔드 개발자  
 📫 fayzullo.coder@gmail.com
 
