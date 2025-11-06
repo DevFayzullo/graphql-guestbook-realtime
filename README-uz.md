@@ -4,7 +4,13 @@ Bu **Apollo Server / Apollo Client / React / Vite / Tailwind CSS** yordamida qur
 to‘liq **GraphQL full-stack loyihasi**.  
 U **Query, Mutation, Subscription (Realtime)**, **Optimistic UI**, va **HTTP + WebSocket split link** texnologiyalarini o‘z ichiga oladi.
 
+---
 
+## 🖼 Project Banner
+
+![GraphQL Guestbook Banner](./frontend/public/banner.png)
+
+---
 <!-- ---
 
 ## 🌐 Demo
