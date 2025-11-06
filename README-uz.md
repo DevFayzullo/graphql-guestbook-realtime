@@ -6,7 +6,7 @@ U **Query, Mutation, Subscription (Realtime)**, **Optimistic UI**, va **HTTP + W
 
 ---
 
-## 🖼 Project Banner
+## 🖼 Proyekt Banneri
 
 ![GraphQL Guestbook Banner](./frontend/public/banner.png)
 
