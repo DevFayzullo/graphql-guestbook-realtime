@@ -4,6 +4,12 @@
 **전체 스택 GraphQL 프로젝트**입니다.  
 **Query, Mutation, Subscription (실시간)**, **Optimistic UI**, **HTTP + WebSocket 분리 링크**를 포함합니다.
 
+---
+## 🖼 Project Banner
+
+![GraphQL Guestbook Banner](./frontend/public/banner.png)
+
+---
 
 <!-- ---
 
