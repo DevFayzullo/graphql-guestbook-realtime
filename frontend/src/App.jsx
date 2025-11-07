@@ -2,17 +2,19 @@ import { useQuery, useMutation, useSubscription } from "@apollo/client";
 import { useMemo, useState } from "react";
 import { QUERY_MESSAGES, MUTATION_ADD, SUB_MESSAGE_ADDED } from "./graphql";
 
+const VARS = { limit: 30, offset: 0 };
+
 export default function App() {
   const [name, setName] = useState("Admin");
   const [text, setText] = useState("");
   const [filter, setFilter] = useState("all");
 
   const { data, loading, error } = useQuery(QUERY_MESSAGES, {
-    variables: { limit: 30, offset: 0 },
+    variables: VARS,
   });
 
   const [addMessage, addState] = useMutation(MUTATION_ADD, {
-    optimisticResponse: {
+    optimisticResponse: ({ name, text }) => ({
       addMessage: {
         __typename: "Message",
         id: `temp-${Date.now()}`,
@@ -20,14 +22,14 @@ export default function App() {
         text,
         createdAt: new Date().toISOString(),
       },
-    },
+    }),
     update: (cache, { data }) => {
       const newMsg = data?.addMessage;
       if (!newMsg) return;
-      const vars = { limit: 30, offset: 0 };
+
       const prev = cache.readQuery({
         query: QUERY_MESSAGES,
-        variables: vars,
+        variables: VARS,
       }) || {
         messages: [],
       };
@@ -36,7 +38,7 @@ export default function App() {
 
       cache.writeQuery({
         query: QUERY_MESSAGES,
-        variables: vars,
+        variables: VARS,
         data: {
           messages: [newMsg, ...prev.messages].slice(0, 30),
         },
@@ -48,10 +50,10 @@ export default function App() {
     onData: ({ client, data }) => {
       const msg = data.data?.messageAdded;
       if (!msg) return;
-      const vars = { limit: 30, offset: 0 };
+
       const prev = client.readQuery({
         query: QUERY_MESSAGES,
-        variables: vars,
+        variables: VARS,
       }) || {
         messages: [],
       };
@@ -60,7 +62,7 @@ export default function App() {
 
       client.writeQuery({
         query: QUERY_MESSAGES,
-        variables: vars,
+        variables: VARS,
         data: {
           messages: [msg, ...prev.messages].slice(0, 30),
         },
@@ -70,24 +72,31 @@ export default function App() {
 
   const onSend = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !text.trim()) return;
+    const trimmedName = name.trim();
+    const trimmedText = text.trim();
+    if (!trimmedName || !trimmedText) return;
+
     await addMessage({
-      variables: { name: name.trim(), text: text.trim() },
+      variables: { name: trimmedName, text: trimmedText },
     });
+
     setText("");
   };
 
   const messages = data?.messages || [];
 
   const filtered = useMemo(() => {
-    if (filter === "mine")
-      return messages.filter((m) => m.name === name.trim());
+    if (filter === "mine") {
+      const me = name.trim();
+      return messages.filter((m) => m.name === me);
+    }
     return messages;
   }, [messages, filter, name]);
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-slate-100 via-slate-100 to-slate-200 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-100 to-slate-200 flex items-center justify-center p-4">
       <div className="w-full max-w-3xl bg-white/60 backdrop-blur shadow-xl rounded-2xl border border-white/50 overflow-hidden">
+        {/* Header */}
         <header className="px-6 py-5 border-b border-slate-200 flex items-center justify-between gap-4 bg-white/70">
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-slate-900 flex items-center gap-2">
@@ -100,12 +109,13 @@ export default function App() {
               Query • Mutation • Subscription • Optimistic UI
             </p>
           </div>
-          <div className="hidden md:flex text-xs text-slate-400 gap-2">
-            <span>HTTP: /graphql</span>
-            <span>WS: /graphql</span>
+          <div className="hidden md:flex flex-col items-end text-[10px] text-slate-400 gap-0.5">
+            <span>HTTP: {import.meta.env.VITE_GRAPHQL_HTTP}</span>
+            <span>WS:&nbsp;&nbsp;&nbsp;{import.meta.env.VITE_GRAPHQL_WS}</span>
           </div>
         </header>
 
+        {/* Form */}
         <form
           onSubmit={onSend}
           className="px-6 pt-5 pb-3 flex flex-col md:flex-row gap-3">
@@ -129,6 +139,7 @@ export default function App() {
           </button>
         </form>
 
+        {/* Filter */}
         <div className="px-6 pb-2 flex gap-2">
           <button
             onClick={() => setFilter("all")}
@@ -150,11 +161,13 @@ export default function App() {
           </button>
         </div>
 
+        {/* Messages */}
         <div className="px-6 pb-6 space-y-3 max-h-[60vh] overflow-y-auto">
           {loading && <p className="text-sm text-slate-400">Loading...</p>}
+
           {error && <p className="text-sm text-red-500">❌ {error.message}</p>}
 
-          {!loading && filtered.length === 0 && (
+          {!loading && filtered.length === 0 && !error && (
             <p className="text-sm text-slate-400 text-center py-12">
               No messages yet. Be the first ✨
             </p>
