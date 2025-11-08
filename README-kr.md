@@ -11,12 +11,10 @@
 
 ---
 
-<!-- ---
+## 🌐 Demo
 
-## 🌐 데모
-
-[🔗 Vercel 라이브 데모](https://your-vercel-app-url.vercel.app)  
-[⚙️ Render 백엔드 API](https://your-render-api-url.onrender.com/graphql) -->
+[🔗 Live Demo (Vercel)](https://graphql-guestbook-realtime.vercel.app)  
+[⚙️ Backend API (Render)](https://graphql-guestbook-realtime.onrender.com/graphql)
 
 ---
 
