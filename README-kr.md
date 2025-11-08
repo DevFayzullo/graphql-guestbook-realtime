@@ -5,7 +5,7 @@
 **Query, Mutation, Subscription (실시간)**, **Optimistic UI**, **HTTP + WebSocket 분리 링크**를 포함합니다.
 
 ---
-## 🖼 Project Banner
+## 🖼 프로젝트 배너
 
 ![GraphQL Guestbook Banner](./frontend/public/banner.png)
 
