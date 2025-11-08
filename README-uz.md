@@ -11,12 +11,11 @@ U **Query, Mutation, Subscription (Realtime)**, **Optimistic UI**, va **HTTP + W
 ![GraphQL Guestbook Banner](./frontend/public/banner.png)
 
 ---
-<!-- ---
 
 ## 🌐 Demo
 
-[🔗 Vercel Live Demo](https://your-vercel-app-url.vercel.app)  
-[⚙️ Render Backend API](https://your-render-api-url.onrender.com/graphql) -->
+[🔗 Live Demo (Vercel)](https://graphql-guestbook-realtime.vercel.app)  
+[⚙️ Backend API (Render)](https://graphql-guestbook-realtime.onrender.com/graphql)
 
 ---
 
