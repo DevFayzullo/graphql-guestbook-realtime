@@ -8,7 +8,7 @@ const WS_URL = import.meta.env.VITE_GRAPHQL_WS;
 
 if (!HTTP_URL || !WS_URL) {
   throw new Error(
-    "VITE_GRAPHQL_HTTP yoki VITE_GRAPHQL_WS topilmadi. .env faylni tekshiring."
+    "VITE_GRAPHQL_HTTP yoki VITE_GRAPHQL_WS topilmadi. .env faylni tekshiring!"
   );
 }
 
