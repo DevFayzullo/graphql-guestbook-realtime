@@ -1,4 +1,4 @@
-# 🪶 GraphQL Guestbook (Realtime)
+## 🪶 GraphQL Guestbook (Realtime)
 
 **A minimal full-stack GraphQL project** built with  
 **Apollo Server / Apollo Client / React / Vite / Tailwind CSS**,  
