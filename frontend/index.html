@@ -1,11 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- ===== Basic Meta ===== -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/frontend/public/favicon.ico" type="image/png" />
-    <title>GraphQL Guestbook (Realtime)</title>
+    <title>
+      GraphQL Guestbook (Realtime) | Chat • Mutation • Subscription Demo
+    </title>
+    <meta
+      name="description"
+      content="A modern realtime GraphQL Guestbook built with Apollo Client, WebSocket Subscriptions, and React. Demonstrates Query, Mutation, and Subscription with Optimistic UI." />
+    <meta
+      name="keywords"
+      content="GraphQL, Apollo, WebSocket, Realtime Chat, Subscription, React, Guestbook, Full Stack Demo" />
+    <meta name="author" content="DevFayzullo" />
+    <link
+      rel="canonical"
+      href="https://graphql-guestbook-realtime.vercel.app/" />
+
+    <!-- ===== Open Graph (Facebook, LinkedIn, etc.) ===== -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://graphql-guestbook-realtime.vercel.app/" />
+    <meta property="og:title" content="GraphQL Guestbook (Realtime)" />
+    <meta
+      property="og:description"
+      content="A realtime GraphQL Guestbook built with Apollo Client, WebSocket Subscriptions, and React. Explore how GraphQL Query, Mutation, and Subscription work together." />
+    <meta
+      property="og:image"
+      content="https://graphql-guestbook-realtime.vercel.app/assets/banner.png" />
+    <meta property="og:site_name" content="GraphQL Guestbook" />
+
+    <!-- ===== Twitter Card (X Preview) ===== -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GraphQL Guestbook (Realtime)" />
+    <meta
+      name="twitter:description"
+      content="A modern realtime GraphQL Guestbook powered by Apollo Client and WebSockets." />
+    <meta
+      name="twitter:image"
+      content="https://graphql-guestbook-realtime.vercel.app/assets/banner.png" />
+
+    <!-- ===== Theme & Icons ===== -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="/favicon.ico" />
+    <meta name="theme-color" content="#0ea5e9" />
+
+    <!-- ===== Manifest (PWA readiness) ===== -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- ===== Robots & Indexing ===== -->
+    <meta name="robots" content="index, follow" />
+    <meta
+      name="googlebot"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+    <!-- ===== Language / Locale ===== -->
+    <meta http-equiv="Content-Language" content="en" />
+
+    <!-- ===== Schema.org (Structured Data for Google) ===== -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "GraphQL Guestbook (Realtime)",
+        "description": "A realtime GraphQL Guestbook built with Apollo Client, WebSocket Subscriptions, and React.",
+        "url": "https://graphql-guestbook-realtime.vercel.app/",
+        "applicationCategory": "Developer Tool",
+        "creator": {
+          "@type": "Person",
+          "name": "DevFayzullo"
+        },
+        "operatingSystem": "All",
+        "softwareVersion": "1.0.0"
+      }
+    </script>
   </head>
+
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
