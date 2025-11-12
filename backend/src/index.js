@@ -9,12 +9,22 @@ import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import { PubSub } from "graphql-subscriptions";
 
+// --- PubSub va xotiradagi ma'lumotlar
 const pubsub = new PubSub();
 const MESSAGE_ADDED = "MESSAGE_ADDED";
 
-const typeDefs = `#graphql
-  scalar Date
+// oddiy in-memory array (demo uchun)
+const messages = [
+  {
+    id: "1",
+    name: "Admin",
+    text: "Welcome to GraphQL Guestbook 👋",
+    createdAt: new Date().toISOString(),
+  },
+];
 
+// --- GraphQL schema (SDL)
+const typeDefs = `#graphql
   type Message {
     id: ID!
     name: String!
@@ -35,32 +45,27 @@ const typeDefs = `#graphql
   }
 `;
 
-let messages = [
-  {
-    id: "1",
-    name: "Admin",
-    text: "Welcome to GraphQL Guestbook 👋",
-    createdAt: new Date().toISOString(),
-  },
-];
-
+// --- Resolvers
 const resolvers = {
   Query: {
-    messages: (_, { limit, offset }) =>
-      messages
-        .slice()
+    messages: (_, { limit = 30, offset = 0 }) => {
+      // eng oxirgi xabarlar yuqorida bo'lsin
+      return messages
+        .slice() // copy
         .reverse()
-        .slice(offset, offset + limit),
+        .slice(offset, offset + limit);
+    },
   },
   Mutation: {
     addMessage: async (_, { name, text }) => {
       const msg = {
-        id: String(Date.now()),
+        id: Date.now().toString(),
         name,
         text,
         createdAt: new Date().toISOString(),
       };
       messages.push(msg);
+      // subscription uchun publish
       await pubsub.publish(MESSAGE_ADDED, { messageAdded: msg });
       return msg;
     },
@@ -72,28 +77,39 @@ const resolvers = {
   },
 };
 
+// --- Schema yaratamiz
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
+// --- Express + HTTP server
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
 const httpServer = http.createServer(app);
 
-// WS server
+// --- WebSocket server (graphql-ws) /graphql path da
 const wsServer = new WebSocketServer({
   server: httpServer,
   path: "/graphql",
 });
+
 useServer({ schema }, wsServer);
 
-// Apollo HTTP
+// --- Apollo Server (HTTP) /graphql path da
 const server = new ApolloServer({ schema });
 await server.start();
-app.use("/graphql", expressMiddleware(server));
 
+app.use(
+  "/graphql",
+  expressMiddleware(server, {
+    context: async () => ({}),
+  })
+);
+
+// --- Port
 const PORT = process.env.PORT || 4000;
+
 httpServer.listen(PORT, () => {
-  console.log(`HTTP  : http://localhost:${PORT}/graphql`);
-  console.log(`WS    : ws://localhost:${PORT}/graphql`);
+  console.log(`🚀 HTTP ready at http://localhost:${PORT}/graphql`);
+  console.log(`🔌 WS ready at ws://localhost:${PORT}/graphql`);
 });
