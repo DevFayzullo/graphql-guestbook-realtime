@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useSubscription } from "@apollo/client";
 import { useMemo, useState } from "react";
 import { QUERY_MESSAGES, MUTATION_ADD, SUB_MESSAGE_ADDED } from "./graphql";
+//FIX IT!
 
 const VARS = { limit: 30, offset: 0 };
 
