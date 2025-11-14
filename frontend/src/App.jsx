@@ -9,66 +9,54 @@ export default function App() {
   const [text, setText] = useState("");
   const [filter, setFilter] = useState("all");
 
-  const { data, loading, error } = useQuery(QUERY_MESSAGES, {
+  // 1) Messages query
+  const { data, loading, error, refetch } = useQuery(QUERY_MESSAGES, {
     variables: VARS,
+    fetchPolicy: "network-only",
   });
 
-  // --- MUTATION: optimistic + cache update (cache.updateQuery bilan)
+  // 2) Add message mutation — faqat server tugagach refetch qilamiz
   const [addMessage, addState] = useMutation(MUTATION_ADD, {
-    optimisticResponse: ({ name, text }) => ({
-      addMessage: {
-        __typename: "Message",
-        id: `temp-${Date.now()}`,
-        name,
-        text,
-        createdAt: new Date().toISOString(),
-      },
-    }),
-    update: (cache, { data }) => {
-      const newMsg = data?.addMessage;
-      if (!newMsg) return;
-
-      cache.updateQuery({ query: QUERY_MESSAGES, variables: VARS }, (prev) => {
-        const list = prev?.messages ?? [];
-        if (list.some((m) => m.id === newMsg.id)) return prev;
-        return { messages: [newMsg, ...list].slice(0, 30) };
-      });
+    onCompleted: () => {
+      refetch();
     },
   });
 
-  // --- SUBSCRIPTION: realtime update (client.updateQuery bilan)
+  // 3) Subscription — yangi xabar kelganda ham refetch
   useSubscription(SUB_MESSAGE_ADDED, {
-    onData: ({ client, data }) => {
-      const msg = data.data?.messageAdded;
-      if (!msg) return;
-
-      client.updateQuery({ query: QUERY_MESSAGES, variables: VARS }, (prev) => {
-        const list = prev?.messages ?? [];
-        if (list.some((m) => m.id === msg.id)) return prev;
-        return { messages: [msg, ...list].slice(0, 30) };
-      });
+    onData: () => {
+      refetch();
     },
   });
 
+  // 4) Form submit
   const onSend = async (e) => {
     e.preventDefault();
     const trimmedName = name.trim();
     const trimmedText = text.trim();
     if (!trimmedName || !trimmedText) return;
-    await addMessage({ variables: { name: trimmedName, text: trimmedText } });
+
+    await addMessage({
+      variables: { name: trimmedName, text: trimmedText },
+    });
+
     setText("");
   };
 
   const messages = data?.messages || [];
 
+  // 5) Filtering
   const filtered = useMemo(() => {
-    if (filter === "mine")
-      return messages.filter((m) => m.name === name.trim());
+    if (filter === "mine") {
+      const me = name.trim();
+      return messages.filter((m) => m.name === me);
+    }
     return messages;
   }, [messages, filter, name]);
 
+  // 6) UI
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-100 to-slate-200 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-b from-slate-100 via-slate-100 to-slate-200 flex items-center justify-center p-4">
       <div className="w-full max-w-3xl bg-white/60 backdrop-blur shadow-xl rounded-2xl border border-white/50 overflow-hidden">
         {/* Header */}
         <header className="px-6 py-5 border-b border-slate-200 flex items-center justify-between gap-4 bg-white/70">
@@ -139,6 +127,7 @@ export default function App() {
         <div className="px-6 pb-6 space-y-3 max-h-[60vh] overflow-y-auto">
           {loading && <p className="text-sm text-slate-400">Loading...</p>}
           {error && <p className="text-sm text-red-500">❌ {error.message}</p>}
+
           {!loading && filtered.length === 0 && !error && (
             <p className="text-sm text-slate-400 text-center py-12">
               No messages yet. Be the first ✨

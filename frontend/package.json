@@ -9,9 +9,9 @@
     "preview": "vite preview --port 5174"
   },
   "dependencies": {
-    "@apollo/client": "^3.11.8",
+    "@apollo/client": "3.9",
     "@tailwindcss/postcss": "^4.1.16",
-    "graphql": "^16.9.0",
+    "graphql": "^16.12.0",
     "graphql-ws": "^5.14.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
