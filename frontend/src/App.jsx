@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useSubscription } from "@apollo/client";
 import { useMemo, useState } from "react";
 import { QUERY_MESSAGES, MUTATION_ADD, SUB_MESSAGE_ADDED } from "./graphql";
-//FIX IT!
 
 const VARS = { limit: 30, offset: 0 };
 
@@ -14,6 +13,7 @@ export default function App() {
     variables: VARS,
   });
 
+  // --- MUTATION: optimistic + cache update (cache.updateQuery bilan)
   const [addMessage, addState] = useMutation(MUTATION_ADD, {
     optimisticResponse: ({ name, text }) => ({
       addMessage: {
@@ -28,45 +28,24 @@ export default function App() {
       const newMsg = data?.addMessage;
       if (!newMsg) return;
 
-      const prev = cache.readQuery({
-        query: QUERY_MESSAGES,
-        variables: VARS,
-      }) || {
-        messages: [],
-      };
-
-      if (prev.messages.some((m) => m.id === newMsg.id)) return;
-
-      cache.writeQuery({
-        query: QUERY_MESSAGES,
-        variables: VARS,
-        data: {
-          messages: [newMsg, ...prev.messages].slice(0, 30),
-        },
+      cache.updateQuery({ query: QUERY_MESSAGES, variables: VARS }, (prev) => {
+        const list = prev?.messages ?? [];
+        if (list.some((m) => m.id === newMsg.id)) return prev;
+        return { messages: [newMsg, ...list].slice(0, 30) };
       });
     },
   });
 
+  // --- SUBSCRIPTION: realtime update (client.updateQuery bilan)
   useSubscription(SUB_MESSAGE_ADDED, {
     onData: ({ client, data }) => {
       const msg = data.data?.messageAdded;
       if (!msg) return;
 
-      const prev = client.readQuery({
-        query: QUERY_MESSAGES,
-        variables: VARS,
-      }) || {
-        messages: [],
-      };
-
-      if (prev.messages.some((m) => m.id === msg.id)) return;
-
-      client.writeQuery({
-        query: QUERY_MESSAGES,
-        variables: VARS,
-        data: {
-          messages: [msg, ...prev.messages].slice(0, 30),
-        },
+      client.updateQuery({ query: QUERY_MESSAGES, variables: VARS }, (prev) => {
+        const list = prev?.messages ?? [];
+        if (list.some((m) => m.id === msg.id)) return prev;
+        return { messages: [msg, ...list].slice(0, 30) };
       });
     },
   });
@@ -76,21 +55,15 @@ export default function App() {
     const trimmedName = name.trim();
     const trimmedText = text.trim();
     if (!trimmedName || !trimmedText) return;
-
-    await addMessage({
-      variables: { name: trimmedName, text: trimmedText },
-    });
-
+    await addMessage({ variables: { name: trimmedName, text: trimmedText } });
     setText("");
   };
 
   const messages = data?.messages || [];
 
   const filtered = useMemo(() => {
-    if (filter === "mine") {
-      const me = name.trim();
-      return messages.filter((m) => m.name === me);
-    }
+    if (filter === "mine")
+      return messages.filter((m) => m.name === name.trim());
     return messages;
   }, [messages, filter, name]);
 
@@ -165,9 +138,7 @@ export default function App() {
         {/* Messages */}
         <div className="px-6 pb-6 space-y-3 max-h-[60vh] overflow-y-auto">
           {loading && <p className="text-sm text-slate-400">Loading...</p>}
-
           {error && <p className="text-sm text-red-500">❌ {error.message}</p>}
-
           {!loading && filtered.length === 0 && !error && (
             <p className="text-sm text-slate-400 text-center py-12">
               No messages yet. Be the first ✨
