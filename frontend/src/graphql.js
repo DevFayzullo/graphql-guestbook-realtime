@@ -23,7 +23,7 @@ export const MUTATION_ADD = gql`
 `;
 
 export const SUB_MESSAGE_ADDED = gql`
-  subscription MessageAdded {
+  subscription OnMessageAdded {
     messageAdded {
       id
       name
