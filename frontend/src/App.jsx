@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useSubscription } from "@apollo/client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { QUERY_MESSAGES, MUTATION_ADD, SUB_MESSAGE_ADDED } from "./graphql";
 
 const VARS = { limit: 30, offset: 0 };
@@ -9,27 +9,49 @@ export default function App() {
   const [text, setText] = useState("");
   const [filter, setFilter] = useState("all");
 
-  // 1) Messages query
-  const { data, loading, error, refetch } = useQuery(QUERY_MESSAGES, {
+  // 🔹 Apollo query (network only)
+  const { data, loading, error } = useQuery(QUERY_MESSAGES, {
     variables: VARS,
     fetchPolicy: "network-only",
   });
 
-  // 2) Add message mutation — faqat server tugagach refetch qilamiz
+  // 🔹 Local React state for messages (UI faqat shundan render qiladi)
+  const [messages, setMessages] = useState([]);
+
+  // 1️⃣ Query natijasi kelganda local state'ga yozib qo'yamiz
+  useEffect(() => {
+    if (data?.messages) {
+      setMessages(data.messages);
+    }
+  }, [data]);
+
+  // 2️⃣ Mutation – serverdan qaytgach local state'ga qo'shamiz
   const [addMessage, addState] = useMutation(MUTATION_ADD, {
-    onCompleted: () => {
-      refetch();
+    onCompleted: (res) => {
+      const newMsg = res?.addMessage;
+      if (!newMsg) return;
+
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === newMsg.id)) return prev;
+        return [newMsg, ...prev].slice(0, 30);
+      });
     },
   });
 
-  // 3) Subscription — yangi xabar kelganda ham refetch
+  // 3️⃣ Subscription – boshqa clientlardan kelgan xabarlarni qo'shamiz
   useSubscription(SUB_MESSAGE_ADDED, {
-    onData: () => {
-      refetch();
+    onData: ({ data }) => {
+      const msg = data.data?.messageAdded;
+      if (!msg) return;
+
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === msg.id)) return prev;
+        return [msg, ...prev].slice(0, 30);
+      });
     },
   });
 
-  // 4) Form submit
+  // 4️⃣ Form submit
   const onSend = async (e) => {
     e.preventDefault();
     const trimmedName = name.trim();
@@ -43,9 +65,7 @@ export default function App() {
     setText("");
   };
 
-  const messages = data?.messages || [];
-
-  // 5) Filtering
+  // 5️⃣ Filter (All / Mine)
   const filtered = useMemo(() => {
     if (filter === "mine") {
       const me = name.trim();
@@ -54,7 +74,7 @@ export default function App() {
     return messages;
   }, [messages, filter, name]);
 
-  // 6) UI
+  // 6️⃣ UI
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-100 via-slate-100 to-slate-200 flex items-center justify-center p-4">
       <div className="w-full max-w-3xl bg-white/60 backdrop-blur shadow-xl rounded-2xl border border-white/50 overflow-hidden">
