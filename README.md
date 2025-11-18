@@ -77,15 +77,11 @@ VITE_GRAPHQL_WS=ws://localhost:4000/graphql
 - ✅ **Modern Stack:** Apollo split link (HTTP + WS)
 - ✅ **Reusable code:** Clean modular structure
 
-<!-- ---
+
 
 ## 🖼 UI Preview
 
-| Light Mode                                        | Realtime                                |
-| ------------------------------------------------- | --------------------------------------- |
-| ![light mode screenshot](./screenshots/light.png) | ![realtime](./screenshots/realtime.gif) |
-
-> Two browser tabs showing realtime updates ⚡ -->
+![GraphQL GuestBook Preview](./frontend/public/preview.png)
 
 ---
 
@@ -126,17 +122,26 @@ graphql-guestbook-realtime/
 ├── backend/
 │   ├── src/
 │   │   ├── index.js           # Apollo Server + Express + WS
-│   │   └── schema/resolvers   # GraphQL schema and resolvers
 │   └── package.json
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx            # UI + Apollo Hooks (Query/Mutation/Sub)
 │   │   ├── lib/apollo.js      # Apollo Client setup (HTTP/WS split)
+│   │   ├── App.jsx            # UI + Apollo Hooks (Query/Mutation/Sub)
 │   │   ├── graphql.js         # Queries, Mutations, Subscriptions
-│   │   └── index.css          # Tailwind styles
-│   └── package.json
+│   │   ├── index.css          # Tailwind styles
+│   │   └── main.jsx          
+│   ├── .env
+│   ├── .env.production
+│   ├── index.html
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── tailwind.config.js
+│   └── vite.config.js
 │
+├── .gitignore
+├── README-kr.md
+├── README-uz.md
 └── README.md
 ```
 
