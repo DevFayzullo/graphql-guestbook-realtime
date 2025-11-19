@@ -130,7 +130,7 @@ export default function App() {
             {/* Header */}
             <div className="flex items-center justify-between px-6 sm:px-8 pt-6 pb-4 border-b border-slate-200/70 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-md">
+                <div className="h-10 w-10 rounded-2xl bg-linear-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-md">
                   <span className="text-white text-xl">⚡</span>
                 </div>
                 <div>
@@ -215,7 +215,7 @@ export default function App() {
                       key={msg.id}
                       className="px-4 sm:px-5 py-3.5 flex gap-3 hover:bg-white/60 dark:hover:bg-slate-900/70 transition">
                       <div className="mt-1">
-                        <div className="h-8 w-8 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-xs font-semibold text-white shadow-sm">
+                        <div className="h-8 w-8 rounded-2xl bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-xs font-semibold text-white shadow-sm">
                           {msg.name?.[0]?.toUpperCase() || "?"}
                         </div>
                       </div>
@@ -236,7 +236,7 @@ export default function App() {
                               : ""}
                           </span>
                         </div>
-                        <p className="mt-0.5 text-sm text-slate-700 dark:text-slate-200 break-words">
+                        <p className="mt-0.5 text-sm text-slate-700 dark:text-slate-200 wrap-break-word">
                           {msg.text}
                         </p>
                       </div>
@@ -264,7 +264,7 @@ export default function App() {
                 <button
                   type="submit"
                   disabled={sending || !text.trim()}
-                  className="sm:self-end h-10 px-5 rounded-xl text-sm font-semibold inline-flex items-center justify-center bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                  className="sm:self-end h-10 px-5 rounded-xl text-sm font-semibold inline-flex items-center justify-center bg-linear-to-r from-indigo-500 to-violet-500 text-white shadow-md hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition">
                   {sending ? "Sending…" : "Send 🚀"}
                 </button>
               </form>

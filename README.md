@@ -77,8 +77,6 @@ VITE_GRAPHQL_WS=ws://localhost:4000/graphql
 - ✅ **Modern Stack:** Apollo split link (HTTP + WS)
 - ✅ **Reusable code:** Clean modular structure
 
-
-
 ## 🖼 UI Preview
 
 ![GraphQL GuestBook Preview](./frontend/public/preview.png)
@@ -125,12 +123,18 @@ graphql-guestbook-realtime/
 │   └── package.json
 │
 ├── frontend/
+│   ├── public/
+│   │   ├── icons/
+│   │   ├── banner.png
+│   │   ├── favicon.ico
+│   │   ├── manifest.json
+│   │   ├── preview.png
 │   ├── src/
 │   │   ├── lib/apollo.js      # Apollo Client setup (HTTP/WS split)
 │   │   ├── App.jsx            # UI + Apollo Hooks (Query/Mutation/Sub)
 │   │   ├── graphql.js         # Queries, Mutations, Subscriptions
 │   │   ├── index.css          # Tailwind styles
-│   │   └── main.jsx          
+│   │   └── main.jsx
 │   ├── .env
 │   ├── .env.production
 │   ├── index.html
@@ -168,4 +172,3 @@ graphql-guestbook-realtime/
 ## 🪪 License
 
 MIT
-
