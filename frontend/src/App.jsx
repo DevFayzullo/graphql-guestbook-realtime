@@ -97,7 +97,7 @@ export default function App() {
       // Log any errors to the console; in a real app you might show
       // feedback to the user instead of an alert.
       console.error(err);
-      alert("Xabar yuborishda xatolik bo'ldi.");
+      alert("An error occurred while sending the message.");
     }
   };
 
@@ -205,7 +205,7 @@ export default function App() {
                 )}
                 {!loading && !error && displayedMessages.length === 0 && (
                   <div className="p-6 text-sm text-slate-500 dark:text-slate-400">
-                    Hozircha xabar yo‘q. Birinchi bo‘lib yozib ko‘r 😉
+                    No messages yet. Try being the first to write 😉
                   </div>
                 )}
 
