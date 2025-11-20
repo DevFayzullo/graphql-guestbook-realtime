@@ -23,15 +23,15 @@ featuring **Query, Mutation, Subscription (Realtime)** with **optimistic UI** an
 
 ## 🧱 Tech Stack
 
-| Layer          | Technology                                       |
-| -------------- | ------------------------------------------------ |
-| **Frontend**   | React + Vite + Apollo Client                     |
-| **UI**         | Tailwind CSS · Responsive · Glassmorphism Design |
-| **Backend**    | Apollo Server + Express + GraphQL Subscriptions  |
-| **Realtime**   | graphql-ws + WebSocket                           |
-| **Language**   | JavaScript (ES Modules)                          |
-| **Deployment** | Vercel (frontend) · Render (backend)             |
-| **Tools**      | npm · Node.js · GitHub                           |
+| Layer          | Technology                                                             |
+| -------------- | ---------------------------------------------------------------------- |
+| **Frontend**   | React + Vite + Apollo Client                                           |
+| **UI**         | Tailwind CSS · Responsive · Glassmorphism Design · Automatic Dark Mode |
+| **Backend**    | Apollo Server + Express + GraphQL Subscriptions                        |
+| **Realtime**   | graphql-ws + WebSocket                                                 |
+| **Language**   | JavaScript (ES Modules)                                                |
+| **Deployment** | Vercel (frontend) · Render (backend)                                   |
+| **Tools**      | npm · Node.js · GitHub                                                 |
 
 ---
 
@@ -76,10 +76,15 @@ VITE_GRAPHQL_WS=ws://localhost:4000/graphql
 - ✅ **Filter Mode:** Show “All” or “My” messages
 - ✅ **Modern Stack:** Apollo split link (HTTP + WS)
 - ✅ **Reusable code:** Clean modular structure
+- ✅ **Dark Mode:** Adapts automatically to your system’s light or dark preference
+
+---
 
 ## 🖼 UI Preview
 
-![GraphQL GuestBook Preview](./frontend/public/preview.png)
+| Light Mode                                                        | Dark Mode                                                       |
+| ----------------------------------------------------------------- | --------------------------------------------------------------- |
+| ![light mode screenshot](./frontend/public/preview-lightMode.png) | ![dark mode screenshot](./frontend/public/preview-darkMode.png) |
 
 ---
 
@@ -115,38 +120,37 @@ VITE_GRAPHQL_WS=ws://localhost:4000/graphql
 ## 📁 Folder Structure
 
 ```txt
-graphql-guestbook-realtime/
+graphql-guestbook-realtime/           # project root
 │
-├── backend/
-│   ├── src/
-│   │   ├── index.js           # Apollo Server + Express + WS
-│   └── package.json
+├── backend/                          # server-side code
+│   ├── src/                          # server source files
+│   │   ├── index.js                  # entry point: Apollo Server + Express + WS
+│   └── package.json                  # backend dependencies and scripts
 │
-├── frontend/
-│   ├── public/
-│   │   ├── icons/
-│   │   ├── banner.png
-│   │   ├── favicon.ico
-│   │   ├── manifest.json
-│   │   ├── preview.png
-│   ├── src/
-│   │   ├── lib/apollo.js      # Apollo Client setup (HTTP/WS split)
-│   │   ├── App.jsx            # UI + Apollo Hooks (Query/Mutation/Sub)
-│   │   ├── graphql.js         # Queries, Mutations, Subscriptions
-│   │   ├── index.css          # Tailwind styles
-│   │   └── main.jsx
-│   ├── .env
-│   ├── .env.production
-│   ├── index.html
-│   ├── package.json
-│   ├── postcss.config.js
-│   ├── tailwind.config.js
-│   └── vite.config.js
+├── frontend/                         # client-side application
+│   ├── public/                       # static assets (icons, images, manifest)
+│   │   ├── icons/                    # custom icons
+│   │   ├── banner.png                # project banner image
+│   │   ├── favicon.ico               # app favicon
+│   │   ├── manifest.json             # PWA manifest
+│   │   └── preview-darkMode.png      # UI preview light mode screenshot
+│   │   └── preview-lightMode.png     # UI preview dark mode screenshot
+│   ├── src/                          # React source code
+│   │   ├── App.jsx                   # main UI component with GraphQL hooks
+│   │   ├── lib/apollo.js             # Apollo Client setup (HTTP/WS split)
+│   │   ├── graphql.js                # GraphQL queries, mutations, subscriptions
+│   │   ├── index.css                 # Tailwind CSS styles
+│   │   └── main.jsx                  # React entry point
+│   ├── index.html                    # HTML template
+│   ├── tailwind.config.js            # Tailwind CSS configuration (media/dark)
+│   ├── postcss.config.js             # PostCSS configuration
+│   ├── package.json                  # frontend dependencies and scripts
+│   └── .env                          # client environment variables
 │
-├── .gitignore
-├── README-kr.md
-├── README-uz.md
-└── README.md
+├── README.md                         # project documentation
+├── README-kr.md                      # Korean translation
+├── README-uz.md                      # Uzbek translation
+└── .gitignore                        # ignore patterns for git
 ```
 
 ---
