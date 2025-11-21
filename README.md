@@ -1,5 +1,7 @@
 # 🪶 GraphQL Guestbook (Realtime)
 
+[🇰🇷 한국어 README](./README-kr.md) • [🇺🇿 O‘zbekcha README](./README-uz.md)
+
 **A minimal full-stack GraphQL project** built with  
 **Apollo Server / Apollo Client / React / Vite / Tailwind CSS**,  
 featuring **Query, Mutation, Subscription (Realtime)** with **optimistic UI** and **HTTP + WebSocket split link**.
