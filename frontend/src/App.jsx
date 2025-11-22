@@ -2,20 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useSubscription } from "@apollo/client";
 import { QUERY_MESSAGES, MUTATION_ADD, SUB_MESSAGE_ADDED } from "./graphql";
 
-// Keep the query variables in a constant so they are easily shared between
-// the query and any optimistic updates.
 const VARS = { limit: 30, offset: 0 };
 
-/**
- * The main application component renders a realtime guestbook backed by a
- * GraphQL API. It supports sending and receiving messages via queries,
- * mutations and subscriptions. A dark mode toggle is provided at the top
- * right of the card; toggling it sets a `.dark` class on the top level
- * element which, in conjunction with the Tailwind configuration, applies
- * dark variants of all relevant classes. The component maintains local
- * state for the current user's name, message text, list of messages and
- * selected filter, and performs live updates when new messages arrive.
- */
 export default function App() {
   // The current user's display name
   const [name, setName] = useState("Guest");
