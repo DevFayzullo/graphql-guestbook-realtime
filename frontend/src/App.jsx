@@ -5,11 +5,10 @@ import { QUERY_MESSAGES, MUTATION_ADD, SUB_MESSAGE_ADDED } from "./graphql";
 const VARS = { limit: 30, offset: 0 };
 
 export default function App() {
-  // The current user's display name
+  
   const [name, setName] = useState("Guest");
-  // The message text input
   const [text, setText] = useState("");
-  // Message filtering: 'all' or 'mine'
+  
   const [filter, setFilter] = useState("all");
   // Dark mode state removed: the UI now follows the browser’s colour-scheme
   // preference automatically via Tailwind’s media-based dark mode. See
