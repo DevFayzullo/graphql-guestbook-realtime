@@ -177,4 +177,4 @@ graphql-guestbook-realtime/           # loyiha ildizi
 
 ## 🪪 Litsenziya
 
-MIT
+MIT.
