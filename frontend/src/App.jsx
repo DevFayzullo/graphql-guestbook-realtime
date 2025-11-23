@@ -10,27 +10,13 @@ export default function App() {
   const [text, setText] = useState("");
   
   const [filter, setFilter] = useState("all");
-  // Dark mode state removed: the UI now follows the browser’s colour-scheme
-  // preference automatically via Tailwind’s media-based dark mode. See
-  // tailwind.config.js for more details. We no longer store an explicit
-  // `isDark` flag or toggle it manually.
-
-  // Fetch initial messages via GraphQL query. The `network-only` fetch policy
-  // ensures that we always hit the network for fresh data when the
-  // component mounts. Variables are passed from the VARS constant.
   const { data, loading, error } = useQuery(QUERY_MESSAGES, {
     variables: VARS,
     fetchPolicy: "network-only",
   });
 
-  // Local state to hold the array of message objects. This is updated
-  // whenever the query returns new data or a subscription/mutation yields a
-  // new message.
   const [messages, setMessages] = useState([]);
 
-  // When the query result changes update the local messages state. The
-  // GraphQL API may expose messages under different field names (e.g.
-  // `messages` or `getMessages`), so we check both possibilities.
   useEffect(() => {
     if (data?.messages) {
       setMessages(data.messages);
@@ -39,24 +25,17 @@ export default function App() {
     }
   }, [data]);
 
-  // Mutation to send a new message. On completion we update the local
-  // messages array. We check both `addMessage` and `createMessage` to
-  // accommodate different GraphQL schema names.
   const [addMessage, { loading: sending }] = useMutation(MUTATION_ADD, {
     onCompleted: (res) => {
       const newMsg = res?.addMessage ?? res?.createMessage;
       if (!newMsg) return;
       setMessages((prev) => {
-        // Avoid duplicating the same message in the list
         if (prev.some((m) => m.id === newMsg.id)) return prev;
-        // Prepend the new message and trim to the VARS.limit
         return [newMsg, ...prev].slice(0, VARS.limit);
       });
     },
   });
 
-  // Subscription to receive realtime updates when a new message is added by
-  // any client. When a message arrives it is prepended to the local list.
   useSubscription(SUB_MESSAGE_ADDED, {
     onData: ({ data: subData }) => {
       const msg = subData?.data?.messageAdded;
@@ -68,10 +47,6 @@ export default function App() {
     },
   });
 
-  // Send a message via the mutation. Prevents sending blank names or
-  // messages and clears the text input on success. Because Apollo
-  // automatically updates the cache, the optimistic update from
-  // `onCompleted` will update the list instantly.
   const handleSend = async (e) => {
     e.preventDefault();
     const trimmedName = name.trim();
@@ -81,16 +56,11 @@ export default function App() {
       await addMessage({ variables: { name: trimmedName, text: trimmedText } });
       setText("");
     } catch (err) {
-      // Log any errors to the console; in a real app you might show
-      // feedback to the user instead of an alert.
       console.error(err);
       alert("An error occurred while sending the message.");
     }
   };
 
-  // Compute the list of messages to show based on the selected filter. The
-  // computation is memoised to avoid recalculations on every render when
-  // unrelated state changes.
   const displayedMessages = useMemo(() => {
     if (filter === "mine") {
       const me = name.trim();
@@ -99,16 +69,7 @@ export default function App() {
     return messages;
   }, [messages, filter, name]);
 
-  // We no longer have a manual dark mode toggle; Tailwind uses the
-  // `prefers-color-scheme` media query to switch between its default and
-  // dark variants based on the user's system preference. If you wish to
-  // persist a user-set theme separately from the OS setting, this would be
-  // the place to implement such logic.
-
-  return (
-    // The outer wrapper no longer conditionally applies a `.dark` class.
-    // Tailwind will automatically pick up the operating system’s colour
-    // scheme preference via the `prefers-color-scheme` media query.
+   return (
     <div>
       {/* Outer container controlling the page background and text colours */}
       <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
